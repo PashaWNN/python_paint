@@ -1,5 +1,5 @@
-from tkinter import Tk, Label, PhotoImage
-from tkinter import filedialog
+from tkinter import Tk, Label, PhotoImage, Button
+from tkinter import filedialog, colorchooser
 import pygubu
 from tools import tools_list
 
@@ -13,8 +13,10 @@ class Application:
         builder.add_from_file('ui.ui')
         self.main_window = builder.get_object('container', root)
         self.tools = self.builder.get_object('tools')
+        self.pallete = self.builder.get_object('pallete')
         self.widths = self.builder.get_object('widths')
         self.canvas = self.builder.get_object('canvas')
+        # TODO: naming for separating view widgets from logic objects
         self._pressed = False
         self.init_ui()
         self.color = 'red'
@@ -45,6 +47,10 @@ class Application:
         lbl.pack(padx=3, pady=2)
         lbl.img = img
 
+        btn = Button(self.pallete, background='red', foreground='red')
+        btn.bind('<Button-1>', self.color_choose)
+        btn.pack()
+
         for tool in tools_list:
             img = PhotoImage(file=f'images/{tool.__name__.lower()}_tool.gif')
             lbl = Label(self.tools, relief='raised', image=img)
@@ -53,13 +59,13 @@ class Application:
             lbl.bind('<Button-1>', self.select_tool)
             lbl.pack(padx=3)
 
-        for width in range(1, 7):
-            img = PhotoImage(file=f'images/{width}.gif')
-            lbl = Label(self.widths, relief='raised', image=img)
-            lbl.img = img
-            lbl.value = width
-            lbl.bind('<Button-1>', self.select_width)
-            lbl.pack(padx=3)
+        # for width in range(1, 7): TODO: implement line widths
+        #     img = PhotoImage(file=f'images/{width}.gif')
+        #     lbl = Label(self.widths, relief='raised', image=img)
+        #     lbl.img = img
+        #     lbl.value = width
+        #     lbl.bind('<Button-1>', self.select_width)
+        #     lbl.pack(padx=3)
 
     def init_canvas(self):
         self.new()
@@ -169,6 +175,13 @@ class Application:
         self.image = PhotoImage(width=self.img_width, height=self.img_height)
         self.canvas.create_image(self.img_width // 2, self.img_height // 2,
                                  image=self.image, state='normal', tag='result')
+
+    def color_choose(self, event):
+        color = colorchooser.askcolor()
+        if color is not None:
+            self.color = color[1]
+            event.widget['background'] = color[1]
+            event.widget['foreground'] = color[1]
 
 
 if __name__ == '__main__':

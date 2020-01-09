@@ -88,5 +88,8 @@ class Rectangle(Tool):
         bresenham_line(x1, y2, x2, y2, img.put_pixel)
 
 
+# TODO: Implement eraser tool
+
+
 tools_list = [Pencil, Line, Oval, Rectangle, Bucket]
 

@@ -110,7 +110,6 @@ def flood_fill(x, y, set_pixel, compare_pixel, width, height):
         if not compare_pixel(x, y):
             continue
         set_pixel(x, y)
-        print(len(to_fill))
         if 0 < x:
             add(x - 1, y)
         if x < width:

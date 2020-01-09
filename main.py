@@ -1,4 +1,5 @@
-from tkinter import Tk, Label, PhotoImage, TclError
+from tkinter import Tk, Label, PhotoImage
+from tkinter import filedialog
 import pygubu
 from tools import tools_list
 
@@ -19,17 +20,45 @@ class Application:
         self.current_tool = None
         self.current_width = None
         self._current_preview = None
-        self.image = PhotoImage(width=self.img_width, height=self.img_height)
+        self.image = None
         self.init_canvas()
 
+    def init_ui(self):
+
+        img = PhotoImage(file='images/save.gif')
+        lbl = Label(self.tools, relief='raised', image=img)
+        lbl.bind('<Button-1>', self.save_click)
+        lbl.pack(padx=3, pady=2)
+        lbl.img = img
+        img = PhotoImage(file='images/open.gif')
+        lbl = Label(self.tools, relief='raised', image=img)
+        lbl.bind('<Button-1>', self.open_click)
+        lbl.pack(padx=3, pady=2)
+        lbl.img = img
+        img = PhotoImage(file='images/clear.gif')
+        lbl = Label(self.tools, relief='raised', image=img)
+        lbl.bind('<Button-1>', self.new_click)
+        lbl.pack(padx=3, pady=2)
+        lbl.img = img
+
+        for tool in tools_list:
+            img = PhotoImage(file=f'images/{tool.__name__.lower()}_tool.gif')
+            lbl = Label(self.tools, relief='raised', image=img)
+            lbl.img = img
+            lbl.tool = tool
+            lbl.bind('<Button-1>', self.select_tool)
+            lbl.pack(padx=3)
+
+        for width in range(1, 7):
+            img = PhotoImage(file=f'images/{width}.gif')
+            lbl = Label(self.widths, relief='raised', image=img)
+            lbl.img = img
+            lbl.value = width
+            lbl.bind('<Button-1>', self.select_width)
+            lbl.pack(padx=3)
+
     def init_canvas(self):
-        self.canvas.create_image(self.img_width // 2, self.img_height // 2,
-                                 image=self.image, state='normal', tag='result')
-        self.image.put('#555555', (1,2))
-        self.image.put('#555555', (1, 3))
-        self.image.put('#555555', (1, 4))
-        self.image.put('#555555', (1, 5))
-        self.image.put('#555555', (1, 6))
+        self.new()
 
         self.canvas.bind('<Button-1>', self.handle_canvas)
         self.canvas.bind('<B1-Motion>', self.handle_canvas)
@@ -104,22 +133,38 @@ class Application:
         lbl['relief'] = 'sunken'
         setattr(self, f'current_{accessory}', lbl)
 
-    def init_ui(self):
-        for tool in tools_list:
-            img = PhotoImage(file=f'images/{tool.__name__.lower()}_tool.gif')
-            lbl = Label(self.tools, relief='raised', image=img)
-            lbl.img = img
-            lbl.tool = tool
-            lbl.bind('<Button-1>', self.select_tool)
-            lbl.pack()
+    def save_click(self, event):
+        f = filedialog.asksaveasfilename(defaultextension='.png')
+        if f is not None:
+            self.image.write(f)
 
-        for width in range(1, 7):
-            img = PhotoImage(file=f'images/{width}.gif')
-            lbl = Label(self.widths, relief='raised', image=img)
-            lbl.img = img
-            lbl.value = width
-            lbl.bind('<Button-1>', self.select_width)
-            lbl.pack(padx=6)
+    def open_click(self, event):
+        f = filedialog.askopenfilename(
+            filetypes=[
+                ('All files','*.*'),
+                ('PNG pictures','*.png'),
+                ('JPEG pictures','*.jpg')
+            ], defaultextension='.jpg')
+        if f:
+            new = PhotoImage(file=f)
+            images = self.canvas.find_withtag('result')
+            for p in images:
+                self.canvas.delete(p)
+            width, height = new.width(), new.height()
+            self.img_width, self.img_height = width, height
+            self.canvas.create_image(width // 2, height // 2, image=new, state='normal', tag='result')
+            self.image = new
+
+    def new_click(self, event):
+        self.new()
+
+    def new(self):
+        images = self.canvas.find_withtag('result')
+        for p in images:
+            self.canvas.delete(p)
+        self.image = PhotoImage(width=self.img_width, height=self.img_height)
+        self.canvas.create_image(self.img_width // 2, self.img_height // 2,
+                                 image=self.image, state='normal', tag='result')
 
 
 if __name__ == '__main__':

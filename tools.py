@@ -71,4 +71,22 @@ class Bucket(Tool):
                    height=img.height())
 
 
-tools_list = [Pencil, Line, Oval, Bucket]
+class Rectangle(Tool):
+
+    @classmethod
+    def handle_press(cls, x, y, img):
+        img.ctx['start_x'] = x
+        img.ctx['start_y'] = y
+
+    @classmethod
+    def handle_motion(cls, x, y, img):
+        x2, y2 = x, y
+        x1, y1 = img.ctx['start_x'], img.ctx['start_y']
+        bresenham_line(x1, y1, x1, y2, img.put_pixel)
+        bresenham_line(x1, y1, x2, y1, img.put_pixel)
+        bresenham_line(x2, y1, x2, y2, img.put_pixel)
+        bresenham_line(x1, y2, x2, y2, img.put_pixel)
+
+
+tools_list = [Pencil, Line, Oval, Rectangle, Bucket]
+

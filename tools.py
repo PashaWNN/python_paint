@@ -1,4 +1,4 @@
-from algorhitms import ellipse, bresenham_line, flood_fill
+from algorithms import ellipse, bresenham_line, flood_fill
 
 
 class Tool:

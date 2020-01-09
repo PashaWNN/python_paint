@@ -1,13 +1,9 @@
-from algorhitms import ellipse, bresenham_line
-
-
-def _safe_put(img, x, y, color='#000000'):
-    if x < 0 or y < 0:
-        return
-    img.put(color, (x, y))
+from algorhitms import ellipse, bresenham_line, flood_fill
 
 
 class Tool:
+    auto_clear = True
+
     @classmethod
     def handle_press(cls, x, y, img):
         pass
@@ -22,6 +18,8 @@ class Tool:
 
 
 class Pencil(Tool):
+    auto_clear = False
+
     @classmethod
     def handle_press(cls, x, y, img):
         img.ctx['last_x'] = x
@@ -29,10 +27,7 @@ class Pencil(Tool):
 
     @classmethod
     def handle_motion(cls, x, y, img):
-        def callback(x, y):
-            _safe_put(img, x, y)
-
-        bresenham_line(img.ctx['last_x'], img.ctx['last_y'], x, y, callback)
+        bresenham_line(img.ctx['last_x'], img.ctx['last_y'], x, y, img.put_pixel)
 
         img.ctx['last_x'] = x
         img.ctx['last_y'] = y
@@ -46,14 +41,9 @@ class Line(Tool):
 
     @classmethod
     def handle_motion(cls, x, y, img):
-        img.blank()
         x2, y2 = x, y
         x1, y1 = img.ctx['start_x'], img.ctx['start_y']
-
-        def callback(x, y):
-            _safe_put(img, x, y)
-
-        bresenham_line(x1, y1, x2, y2, callback)
+        bresenham_line(x1, y1, x2, y2, img.put_pixel)
 
 
 class Oval(Tool):
@@ -64,15 +54,21 @@ class Oval(Tool):
 
     @classmethod
     def handle_motion(cls, x, y, img):
-        img.blank()
         xc, yc = img.ctx['start_x'], img.ctx['start_y']
         rx = abs(xc - x)
         ry = abs(yc - y)
-
-        def callback(x, y):
-            _safe_put(img, x, y)
-
-        ellipse(rx, ry, xc, yc, callback)
+        ellipse(rx, ry, xc, yc, img.put_pixel)
 
 
-tools_list = [Pencil, Line, Oval]
+class Bucket(Tool):
+    auto_clear = False
+    @classmethod
+    def handle_press(cls, x, y, img):
+        current_color = img.get_pixel(x, y)
+        flood_fill(x, y, img.put_pixel,
+                   compare_pixel=lambda i, j: img.get_pixel(i, j) == current_color,
+                   width=img.width(),
+                   height=img.height())
+
+
+tools_list = [Pencil, Line, Oval, Bucket]

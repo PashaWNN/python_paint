@@ -94,3 +94,28 @@ def bresenham_line(x1, y1, x2, y2, callback):
             y += 1
             D -= 2 * dx
         D += 2 * dy
+
+
+def flood_fill(x, y, set_pixel, compare_pixel, width, height):
+    to_fill = set()
+
+    def add(i, j):
+        if compare_pixel(i, j):
+            to_fill.add((i, j))
+
+    add(x, y)
+
+    while to_fill:
+        (x, y) = to_fill.pop()
+        if not compare_pixel(x, y):
+            continue
+        set_pixel(x, y)
+        print(len(to_fill))
+        if 0 < x:
+            add(x - 1, y)
+        if x < width:
+            add(x + 1, y)
+        if y > 0:
+            to_fill.add((x, y - 1))
+        if y < height:
+            to_fill.add((x, y + 1))

@@ -5,12 +5,13 @@ from tools import tools_list
 
 
 class Application:
-    def __init__(self, master):
+    def __init__(self, root):
         self.img_width = 400
         self.img_height = 400
         self.builder = builder = pygubu.Builder()
+        self.root = root
         builder.add_from_file('ui.ui')
-        self.main_window = builder.get_object('container', master)
+        self.main_window = builder.get_object('container', root)
         self.tools = self.builder.get_object('tools')
         self.widths = self.builder.get_object('widths')
         self.canvas = self.builder.get_object('canvas')
@@ -28,16 +29,19 @@ class Application:
         img = PhotoImage(file='images/save.gif')
         lbl = Label(self.tools, relief='raised', image=img)
         lbl.bind('<Button-1>', self.save_click)
+        self.root.bind('<Control-s>', self.save_click)
         lbl.pack(padx=3, pady=2)
         lbl.img = img
         img = PhotoImage(file='images/open.gif')
         lbl = Label(self.tools, relief='raised', image=img)
         lbl.bind('<Button-1>', self.open_click)
+        self.root.bind('<Control-o>', self.open_click)
         lbl.pack(padx=3, pady=2)
         lbl.img = img
         img = PhotoImage(file='images/clear.gif')
         lbl = Label(self.tools, relief='raised', image=img)
         lbl.bind('<Button-1>', self.new_click)
+        self.root.bind('<Control-n>', self.new_click)
         lbl.pack(padx=3, pady=2)
         lbl.img = img
 
@@ -135,7 +139,7 @@ class Application:
 
     def save_click(self, event):
         f = filedialog.asksaveasfilename(defaultextension='.png')
-        if f is not None:
+        if f:
             self.image.write(f)
 
     def open_click(self, event):

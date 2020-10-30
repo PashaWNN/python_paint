@@ -35,12 +35,14 @@ class Application:
         lbl.pack(padx=3, pady=2)
         lbl.img = img
         img = PhotoImage(file='images/open.gif')
+
         lbl = Label(self.tools, relief='raised', image=img)
         lbl.bind('<Button-1>', self.open_click)
         self.root.bind('<Control-o>', self.open_click)
         lbl.pack(padx=3, pady=2)
         lbl.img = img
         img = PhotoImage(file='images/clear.gif')
+
         lbl = Label(self.tools, relief='raised', image=img)
         lbl.bind('<Button-1>', self.new_click)
         self.root.bind('<Control-n>', self.new_click)
@@ -52,7 +54,7 @@ class Application:
         btn.pack()
 
         for tool in tools_list:
-            img = PhotoImage(file=f'images/{tool.__name__.lower()}_tool.gif')
+            img = PhotoImage(file=tool.get_picture_filename())
             lbl = Label(self.tools, relief='raised', image=img)
             lbl.img = img
             lbl.tool = tool

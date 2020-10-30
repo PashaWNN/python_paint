@@ -1,8 +1,13 @@
+from abc import ABC
 from algorithms import ellipse, bresenham_line, flood_fill
 
 
-class Tool:
+class Tool(ABC):
     auto_clear = True
+
+    @classmethod
+    def get_picture_filename(cls):
+        return f'images/{cls.__name__.lower()}_tool.gif'
 
     @classmethod
     def handle_press(cls, x, y, img):
@@ -62,6 +67,7 @@ class Oval(Tool):
 
 class Bucket(Tool):
     auto_clear = False
+
     @classmethod
     def handle_press(cls, x, y, img):
         current_color = img.get_pixel(x, y)
